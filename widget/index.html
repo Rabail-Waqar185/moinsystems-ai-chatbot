@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MoinSystems AI Chatbot — Widget Dev Harness</title>
+    <style>
+      body { font-family: system-ui, sans-serif; margin: 0; padding: 40px; background: #f4f4f6; }
+      h1 { font-size: 18px; color: #333; }
+      p { color: #666; font-size: 14px; }
+    </style>
+  </head>
+  <body>
+    <h1>Dev harness — this page simulates the client's website</h1>
+    <p>The chat widget mounts itself in the bottom-right corner, same as it would on the real site.</p>
+
+    <!-- In production (WordPress), this config object would be printed by the plugin
+         with the real deployed API URL instead of localhost. -->
+    <script>
+      window.MoinChatWidgetConfig = {
+        apiBaseUrl: "http://localhost:8000/api/v1",
+      };
+    </script>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
