@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { KeyboardEvent } from "react";
 
 interface ComposerProps {
@@ -8,6 +8,16 @@ interface ComposerProps {
 
 export function Composer({ onSend, disabled }: ComposerProps) {
   const [value, setValue] = useState("");
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  // The textarea is disabled while a reply is in flight (so focus gets
+  // stripped by the browser automatically). Once it re-enables, bring
+  // focus back so the visitor doesn't have to click in again.
+  useEffect(() => {
+    if (!disabled) {
+      inputRef.current?.focus();
+    }
+  }, [disabled]);
 
   const handleSend = () => {
     if (!value.trim() || disabled) return;
@@ -25,6 +35,7 @@ export function Composer({ onSend, disabled }: ComposerProps) {
   return (
     <div className="moin-chat-composer">
       <textarea
+        ref={inputRef}
         className="moin-chat-composer__input"
         value={value}
         onChange={(e) => setValue(e.target.value)}
