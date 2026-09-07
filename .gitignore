@@ -1,0 +1,23 @@
+# --- Secrets: never committed, ever ---
+**/.env
+!**/.env.example
+
+# --- Python (backend) ---
+**/venv/
+**/.venv/
+**/__pycache__/
+**/*.pyc
+**/*.egg-info/
+**/.pytest_cache/
+**/.ruff_cache/
+
+# --- Node / JS (widget) ---
+**/node_modules/
+**/dist/
+**/build/
+**/.vite/
+**/*.local
+
+# --- OS noise ---
+**/.DS_Store
+**/Thumbs.db
