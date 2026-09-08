@@ -34,7 +34,8 @@ class Settings(BaseSettings):
     # --- LLM provider ---
     llm_provider: Literal["gemini"] = "gemini"
     gemini_api_key: str | None = None
-    gemini_chat_model: str = "gemini-3.6-flash"
+    #gemini_chat_model: str = "gemini-3.6-flash"
+    gemini_chat_model: str = "gemini-flash-lite-latest"
     embedding_model: str = "gemini-embedding-001"
     embedding_dimensions: int = 768
 
