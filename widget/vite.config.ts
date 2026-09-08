@@ -1,7 +1,5 @@
-import { defineConfig } from "vite";
+import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
-
-/// <reference types="vitest/config" />
 
 // Produces a predictably-named JS + CSS bundle in dist/ (not content-hashed),
 // so a WordPress plugin/shortcode can reference fixed filenames per the SRS's
@@ -20,7 +18,9 @@ export default defineConfig({
         entryFileNames: "moin-chat-widget.js",
         chunkFileNames: "moin-chat-widget-[name].js",
         assetFileNames: (assetInfo) =>
-          assetInfo.name?.endsWith(".css") ? "moin-chat-widget.css" : "assets/[name][extname]",
+          assetInfo.name?.endsWith(".css")
+            ? "moin-chat-widget.css"
+            : "assets/[name][extname]",
       },
     },
   },

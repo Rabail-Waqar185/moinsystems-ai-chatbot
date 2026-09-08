@@ -30,7 +30,7 @@ export function LeadForm({ onSubmit, disabled }: LeadFormProps) {
   };
 
   return (
-    <form className="moin-chat-lead-form" onSubmit={handleSubmit}>
+    <form className="moin-chat-lead-form" onSubmit={handleSubmit} noValidate>
       <p className="moin-chat-lead-form__intro">
         To connect you with our team, could you share a few details?
       </p>
@@ -45,7 +45,11 @@ export function LeadForm({ onSubmit, disabled }: LeadFormProps) {
           disabled={disabled}
           maxLength={200}
         />
-        {fieldErrors.full_name && <span className="moin-chat-lead-form__error">{fieldErrors.full_name}</span>}
+        {fieldErrors.full_name && (
+          <span className="moin-chat-lead-form__error">
+            {fieldErrors.full_name}
+          </span>
+        )}
       </label>
 
       <label className="moin-chat-lead-form__field">
@@ -58,7 +62,11 @@ export function LeadForm({ onSubmit, disabled }: LeadFormProps) {
           disabled={disabled}
           maxLength={254}
         />
-        {fieldErrors.email && <span className="moin-chat-lead-form__error">{fieldErrors.email}</span>}
+        {fieldErrors.email && (
+          <span className="moin-chat-lead-form__error">
+            {fieldErrors.email}
+          </span>
+        )}
       </label>
 
       <label className="moin-chat-lead-form__field">
@@ -72,11 +80,17 @@ export function LeadForm({ onSubmit, disabled }: LeadFormProps) {
           maxLength={32}
         />
         {fieldErrors.contact_number && (
-          <span className="moin-chat-lead-form__error">{fieldErrors.contact_number}</span>
+          <span className="moin-chat-lead-form__error">
+            {fieldErrors.contact_number}
+          </span>
         )}
       </label>
 
-      <button type="submit" className="moin-chat-lead-form__submit" disabled={disabled}>
+      <button
+        type="submit"
+        className="moin-chat-lead-form__submit"
+        disabled={disabled}
+      >
         {disabled ? "Sending..." : "Submit"}
       </button>
     </form>
