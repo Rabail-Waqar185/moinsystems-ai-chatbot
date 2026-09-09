@@ -44,12 +44,14 @@ class Settings(BaseSettings):
     rag_similarity_threshold: float = 0.72
 
     # --- Email ---
-    email_provider: Literal["smtp", "transactional"] = "smtp"
+    email_provider: Literal["smtp", "resend"] = "resend"
     smtp_host: str | None = None
     smtp_port: int = 587
     smtp_username: str | None = None
     smtp_password: str | None = None
-    lead_email_to: str = "info@moinsystemsai.com"
+    resend_api_key: str | None = None
+    resend_from_email: str = "onboarding@resend.dev"  # Resend's no-verification-needed testing sender
+    lead_email_to: str = "rabail.waqar185@gmail.com"
 
     # --- Rate limiting ---
     rate_limit: str = "30/minute"

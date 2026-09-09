@@ -15,7 +15,7 @@ from app.core.config import get_settings
 from app.db.models import ChatMessage, EmailNotification, LeadSubmission
 from app.email.base import EmailProvider, EmailSendResult
 from app.email.notification import build_lead_notification
-from app.email.smtp_provider import get_email_provider
+from app.email.factory import get_email_provider
 
 settings = get_settings()
 logger = logging.getLogger(__name__)

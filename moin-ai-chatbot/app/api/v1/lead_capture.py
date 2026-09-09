@@ -14,6 +14,7 @@ from sqlalchemy.orm import Session
 from app.chat.validation import validate_contact_number, validate_email_field, validate_full_name
 from app.db.models import ChatSession, LeadSubmission
 from app.db.session import get_db
+from app.email.service import send_lead_notification
 from app.schemas.lead import LeadCaptureRequest, LeadCaptureResponse
 
 router = APIRouter(prefix="/lead-capture", tags=["lead-capture"])
@@ -66,7 +67,13 @@ def submit_lead(request: LeadCaptureRequest, db: Session = Depends(get_db)) -> L
         source_page=request.source_page or session.source_page,
     )
     db.add(lead)
+    db.flush()  # need lead.id before the notification row references it
     session.lead_state = "complete"
     db.commit()
-    logger.info("lead captured via direct endpoint", extra={"extra_fields": {"session_id": str(session.id)}})
+
+    notification = send_lead_notification(db, lead)
+    logger.info(
+        "lead captured via direct endpoint",
+        extra={"extra_fields": {"session_id": str(session.id), "email_status": notification.status}},
+    )
     return LeadCaptureResponse(session_token=session.session_token, success=True, errors=None)
