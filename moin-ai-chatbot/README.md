@@ -7,6 +7,8 @@ A production-style RAG (Retrieval-Augmented Generation) chatbot with a FastAPI b
 
 > Hosted on free infrastructure tiers (Render, Supabase, Vercel), so the backend may take 30–60 seconds to wake up on the first request if it's been idle.
 
+> This is a personal/portfolio project built end-to-end as a demonstration piece — not a live client deployment. The "company" it answers questions about is a sample dataset, not a real business relationship.
+
 ---
 
 ## What it does
@@ -24,7 +26,7 @@ A production-style RAG (Retrieval-Augmented Generation) chatbot with a FastAPI b
 - **ORM / migrations:** SQLAlchemy + Alembic
 - **Retrieval:** top-k semantic search with a similarity threshold, evaluated against a held-out set of test queries (75% top-3 / 84% top-5 retrieval accuracy across 32 evaluation queries and 97 knowledge chunks)
 - **Lead capture:** a small conversation state machine tracks progress through name → email → project details, persisted per session so users can pick up mid-flow
-- **Email delivery:** provider-agnostic email layer (SMTP or Resend's HTTP API) selected via config, so it can run on hosts that block outbound SMTP ports without any code changes
+- **Email delivery:** provider-agnostic email layer (SMTP or Resend's HTTP API) selected via the `EMAIL_PROVIDER` env var, so it can run on hosts that block outbound SMTP ports without any code changes — see [Environment variables](#environment-variables)
 - **Reliability:** rate limiting (SlowAPI), request size limits, structured JSON logging with request-id tracing, CORS locked to known origins
 
 **Widget — React + TypeScript + Vite**
@@ -44,22 +46,22 @@ A production-style RAG (Retrieval-Augmented Generation) chatbot with a FastAPI b
 moin-ai-chatbot/          FastAPI backend
 ├── app/
 │   ├── api/v1/           HTTP route handlers (chat, lead capture, sessions, health)
-│   ├── chat/             Intent detection, lead-capture logic, conversation service
-│   ├── rag/              Embeddings, ingestion, retrieval, prompt construction
-│   ├── llm/              LLM provider abstraction (Gemini implementation)
-│   ├── email/            Email provider abstraction (SMTP + Resend implementations)
-│   ├── db/               Models, session management, Alembic migrations
-│   ├── core/             Settings, logging, rate limiting
-│   └── schemas/          Pydantic request/response models
-├── scripts/              Dataset conversion, RAG ingestion, retrieval evaluation
-└── tests/                Unit tests
+│   ├── chat/              Intent detection, lead-capture logic, conversation service
+│   ├── rag/               Embeddings, ingestion, retrieval, prompt construction
+│   ├── llm/               LLM provider abstraction (Gemini implementation)
+│   ├── email/             Email provider abstraction (SMTP + Resend implementations)
+│   ├── db/                Models, session management, Alembic migrations
+│   ├── core/              Settings, logging, rate limiting
+│   └── schemas/           Pydantic request/response models
+├── scripts/               Dataset conversion, RAG ingestion, retrieval evaluation
+└── tests/                 Unit tests
 
-widget/                   React + TypeScript embeddable chat widget
+widget/                    React + TypeScript embeddable chat widget
 ├── src/
-│   ├── api/              Typed backend client
-│   ├── components/       Chat panel, message list, lead form, launcher button
-│   ├── hooks/            Widget state management
-│   └── __tests__/        Component tests
+│   ├── api/               Typed backend client
+│   ├── components/        Chat panel, message list, lead form, launcher button
+│   ├── hooks/              Widget state management
+│   └── __tests__/          Component tests
 ```
 
 ## Prerequisites
@@ -83,6 +85,7 @@ pip install -r requirements.txt
 # 3. Copy the env template and fill in real values
 cp .env.example .env            # Windows: copy .env.example .env
 # at minimum set: DATABASE_URL, APP_SECRET, GEMINI_API_KEY
+# (EMBEDDING_MODEL / EMBEDDING_DIMENSIONS and EMAIL_PROVIDER also live here — see below)
 
 # 4. Create the database (if it doesn't exist yet)
 createdb moin_ai_chatbot
@@ -112,7 +115,10 @@ The dev harness (`index.html`) simulates an embedding page and points the widget
 
 ## Environment variables
 
-See `.env.example` for the full list with comments. Required: `DATABASE_URL`, `APP_SECRET`, `GEMINI_API_KEY`. Everything else (rate limits, similarity threshold, email provider choice, etc.) has a working default.
+See `.env.example` for the full list with comments. Required: `DATABASE_URL`, `APP_SECRET`, `GEMINI_API_KEY`. Everything else has a working default, but two settings are worth knowing about explicitly:
+
+- **`EMBEDDING_MODEL` / `EMBEDDING_DIMENSIONS`** — must stay in sync with the vector column width baked into `0001_initial_schema.py` at creation time. See [Design notes](#design-notes) below before changing either.
+- **`EMAIL_PROVIDER`** — `smtp` or `resend`. Defaults to whichever the deployment environment supports; free hosting tiers (like Render) commonly block outbound SMTP ports, so `resend` is the production default here. Switching is a one-line env change, no code changes required.
 
 ## Testing
 
@@ -155,7 +161,7 @@ This keeps the built bundle environment-agnostic — the same file works in deve
 
 ## Design notes
 
-- Embeddings use Gemini's `gemini-embedding-001` at 768 dimensions. Switching embedding models with a different dimension requires updating both `EMBEDDING_DIMENSIONS` in `.env` and the vector column width in `0001_initial_schema.py` — it's fixed at creation time, not adjustable after the fact.
+- Embeddings use Gemini's `gemini-embedding-001` at 768 dimensions. Switching embedding models with a different dimension requires updating both `EMBEDDING_DIMENSIONS` in `.env` **and** the vector column width in `0001_initial_schema.py` — it's fixed at creation time, not adjustable after the fact.
 - The `ivfflat` index uses `lists = 100` as a starting point; this should be re-tuned based on real row counts as the knowledge base grows.
 
 ## Notes on the deployment stack
